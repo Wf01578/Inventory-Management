@@ -1,0 +1,65 @@
+<HTML>
+
+<head>
+<h1>
+Welcome!
+</h1>
+</head>
+
+<Body>
+
+    <div id="root"></div>
+
+<form>
+    <ul>
+        <li>
+            <a href="uploadData.html">
+            <input type = "button" id="searchButton" value="Upload Inventory Data (CSV format)">
+            </a>
+        </li>
+        <li>
+            <a href="Browse.html">
+                <input type = "button" id="searchButton" value="Search Inventory">
+                </a>
+        </li>
+        <li>
+            <a href="adminSetup.html">
+                <input type = "button" id="SetupOwner" value="Setup an admin account">
+                </a>
+        </li>
+        <li>
+            <a href="adminLogin.html">
+                <input type = "button" id="loginOwner" value="Log into an exsisting admin account">
+                </a>
+        </li>
+    </ul>
+    
+
+
+
+</form>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-dom.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.21.1/babel.min.js"></script>
+<script src="reqs/pouchdb-7.2.1.min.js"></script>
+
+<script type="text/babel">
+    var pouchDB = new PouchDB("logins");
+    var pouchDB = new PouchDB("Inventory");
+    
+    class Greeting extends React.Component {
+        render() {
+            return (<p>This is an inventory Management Service</p>);
+        }
+    }ReactDOM.render(
+        <Greeting />,
+        document.getElementById('root')
+    );
+</script>
+
+
+</Body>
+
+</HTML>
