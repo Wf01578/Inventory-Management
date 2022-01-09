@@ -1,0 +1,90 @@
+<HTML>
+
+    <header>
+        <h1>
+        Login to an Exsisting Admin Account
+        </h1>
+    </header>
+    <body>
+        <form>
+            <ul>
+                <li>
+                    <input type= "text" id="username" size="40" value="Enter your username here">
+                </li>
+
+                <li>
+                    <input type= "text" id="password" size="40" value="Enter your Password here">
+                </li>
+
+                <li>
+                    <input type = "button" id="submitSetup" value = "Submit"> 
+                </li>
+
+                <li>
+                    <label for="returnToHome"><a href="Index.html">Return to the Home Page</a></label>                      
+                </li>
+
+                <li>
+                    <label for="goToSetup"><a href="adminSetup.html">Need to create a new Admin Account?</a></label> 
+                </li>
+
+                <li>
+                    <Label for="LoginState"></Label>
+                </li>
+            </ul>
+
+        </form>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-dom.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.21.1/babel.min.js"></script>
+        <script src="reqs/pouchdb-7.2.1.min.js"></script>
+        <script src="reqs/pouchdb.find.js"></script>
+
+
+
+
+        <script>
+
+
+            
+            var loginsDB = new PouchDB("Logins");
+
+            document.getElementById("submitSetup").addEventListener("click", function() {
+                var uName = document.getElementById("username").value;
+                var pWord = document.getElementById("password").value;
+
+
+                
+                    //the following 2 lines were used for debug, todo: disable upon completion
+                    console.log(uName);
+                    console.log(pWord);
+                var tempJSON = "";
+
+
+                loginsDB.createIndex({
+                index: {
+                    fields: ['username', 'password'],
+                    sort: ['username']
+                }
+                }).then(function () {
+                tempJSON += (loginsDB.find({
+                    selector: {
+                    name: uName,
+                    password: pWord
+                    }
+                }));
+                });
+                //var parsedJSON = JSON.parse(tempJSON);
+                var storedPWord = tempJSON.password;
+                if(pWord == storedPWord){
+                    console.log("Password authentication successful")
+
+                }
+
+                    
+            });
+        </script>
+    </body>
+
+</HTML>
