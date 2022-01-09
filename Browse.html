@@ -7,17 +7,153 @@
     </head>
     
     <Body>
-        <form>
-            <input type="button" id="browseData" value="Browse Your current Inventory">
+        
+<form>
+    <ul>
+        <li>
+            <input type =  "text" id = "make" name = "make" value = "Search Vehicles by make" size ="40">
+            <input type = "checkbox" id= "useMake">
+            <p> <span></span> Use make as a search parameter? (If yes, check the box) </span> </p>
+        </li>
 
-        </form>
+        <li>
+            <input type =  "text" id = "model" name = "model" value = "Search Vehicles by Model" size ="40">
+            <input type = "checkbox" id= "useModel">
+            <p> <span></span> Use Model as a search parameter? (If yes, check the box) </span> </p>
+        </li>
+
+        <li>
+            <input type =  "text" id = "year" name = "year" value = "Search Vehicles by year" size ="20">
+            <input type = "checkbox" id= "useYear">
+            <p> <span></span> Use year as a search parameter? (If yes, check the box) </span> </p>
+        </li>
+
+        <li>
+            <input type =  "text" id = "pack" name = "pack" value = "Search Vehicles by package(e.g LS, LX)" size ="40">
+            <input type = "checkbox" id= "usePack">
+            <p> <span></span> Use package as a search parameter? (If yes, check the box) </span> </p>
+        </li>
+
+        <li>
+            <!-- <input type =  "text" id = "bodyStyle" name = "bodyStyle" value = "Search Vehicles by BodyStyle" size ="40"> // opted for a drop-down menu rather than text-->
+            <select id="bodyStyle">  
+                <option value = "Coupe" > Coupe (2-door)
+                </option>  
+                <option value = "Sedan"> sedan (4-door)
+                </option>  
+                <option value = "Truck"> Truck
+                </option>  
+                <option value = "SUV"> SUV
+                </option>
+                <option value = "HatchBack"> Hatchback
+                </option>
+                <option value = "CrossOver"> Cross-Over
+                </option>
+                </select> 
+            <input type = "checkbox" id= "useBodyStyle">
+            <p>  Use make as a search parameter? (If yes, check the box) </p>
+        </li>
+
+        <li>
+            <input type= "button" id="submitSearch" value="Run Search based on the above parameters">
+        </li>
+
+        <li>
+            <label for="returnToHome"><a href="Index.html">Return to the Home Page</a></label>
+
+              
+        </li>
+    </ul>
+
+
+</form>
+
+        <tbody>
+            <tr key= "lotID">
+              <th>lotID</th>
+              <th>Make</th>
+              <th>Model</th>
+              <th>Year</th>
+              <th>Package</th>
+              <th>Body Style</th>
+            </tr>
+            <!-- display database search results here -->
+          
+      </tbody>
         
     
     
     
-    </form>
     
     
+    <style>
+        tr {
+            display: block;
+            float: center;
+            padding: 40px
+        }
+        th,
+        td {
+            display: block;
+            text-align: center;
+            padding: 20px;
+            border: 1px solid rgb(75, 66, 66);
+        
+        }
+        p {
+            display: inline;
+        }
+
+    </style>
+            <script src="reqs/pouchdb-7.2.1.min.js"></script>
+            <script src="reqs/pouchdb.find.js"></script>
+    <script>
+        document.getElementById("submitSearch").addEventListener("click", function (){
+            
+            var boolMake = document.getElementById('useMake').checked;
+            var boolModel = document.getElementById('useModel').checked;           
+            var boolYear = document.getElementById('useYear').checked;
+            var boolPack = document.getElementById('usePack').checked;
+            var boolBodyStyle = document.getElementById('useBodyStyle').checked;
+            
+            if(boolMake){
+                var makeElement = document.getElementById('make');
+                var makeValue = makeElement.value;
+                console.log(makeValue);
+                //send data to PouchDB, first create index based on number of parameters specified(by checkboxes), then send the values of those parameters to perform the search
+                //todo create index based on number of checkboxes checked on search screen.
+            }
+
+            if(boolModel){
+                var modelElement = document.getElementById('model');
+                var modelValue = modelElement.value;
+                console.log(modelValue);
+                
+            }
+
+            if(boolYear){
+                var yearElement = document.getElementById('year');
+                var yearValue = yearElement.value;
+                console.log(yearValue);
+            }
+
+            if(boolPack){
+                var packElement = document.getElementById('pack');
+                var packValue = packElement.value;
+                console.log(packValue);
+            }
+            if(boolBodyStyle){
+                var bodyDropDown = document.getElementById('bodyStyle');
+                var bodyValue = bodyDropDown.options[bodyDropDown.selectedIndex].value;
+                console.log(bodyValue);
+            }
+
+
+        });
+
+    
+
+    </script>
     </Body>
     
     </HTML>
