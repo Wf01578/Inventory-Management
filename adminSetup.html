@@ -1,0 +1,49 @@
+<HTML>
+
+    <header>
+        <h1>
+        Create an Admin Account
+        </h1>
+    </header>
+    <body>
+        <form>
+            <ul>
+                <li>
+                <input type= "text" id="username" size="40" value="Enter your username here">
+                </li>
+                <li>
+                    <input type= "text" id="password" size="40" value="Enter your Password here">
+                </li>
+                <li>
+                    <input type= "text" id="confirmPassword" size="40" value="Enter your Password again to confirm">
+                </li>
+                <li>
+                    <input type = "button" id="submitSetup" value = "Submit"> 
+
+                </li>
+                <li>
+                    <label for="returnToHome"><a href="Index.html">Return to the Home Page</a></label>
+        
+                      
+                </li>
+                <li>
+                    <label for="returnToHome"><a href="adminLogin.html">Already have an Admin Account? Login here</a></label>
+        
+                      
+                </li>
+            </ul>
+
+        </form>
+        <script>
+            document.getElementById("submitSetup").addEventListener("click", function() {
+                if ( document.getElementById("password").value == document.getElementById("confirmPassword").value ){
+                    //send username/password combo to pouchDB
+                    console.log(document.getElementById("username").value);
+                    console.log(document.getElementById("password").value);
+                }
+                    
+            });
+        </script>
+    </body>
+
+</HTML>
