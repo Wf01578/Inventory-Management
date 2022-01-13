@@ -1,3 +1,4 @@
+
 <HTML>
 
     <head>
@@ -13,25 +14,25 @@
         <li>
             <input type =  "text" id = "make" name = "make" value = "Search Vehicles by make" size ="40">
             <input type = "checkbox" id= "useMake">
-            <p> <span></span> Use make as a search parameter? (If yes, check the box) </span> </p>
+            <p> <span> Use Make as a search parameter? (If yes, check the box and enter your search term in the textbox) </span> </p>
         </li>
 
         <li>
             <input type =  "text" id = "model" name = "model" value = "Search Vehicles by Model" size ="40">
             <input type = "checkbox" id= "useModel">
-            <p> <span></span> Use Model as a search parameter? (If yes, check the box) </span> </p>
+            <p> <span> Use Model as a search parameter? (If yes, check the box and enter your search term in the textbox) </span> </p>
         </li>
 
         <li>
             <input type =  "text" id = "year" name = "year" value = "Search Vehicles by year" size ="20">
             <input type = "checkbox" id= "useYear">
-            <p> <span></span> Use year as a search parameter? (If yes, check the box) </span> </p>
+            <p> <span> Use year as a search parameter? (If yes, check the box and enter your search term in the textbox) </span> </p>
         </li>
 
         <li>
             <input type =  "text" id = "pack" name = "pack" value = "Search Vehicles by package(e.g LS, LX)" size ="40">
             <input type = "checkbox" id= "usePack">
-            <p> <span></span> Use package as a search parameter? (If yes, check the box) </span> </p>
+            <p> <span> Use package as a search parameter? (If yes, check the box and enter your search term in the textbox) </span> </p>
         </li>
 
         <li>
@@ -51,35 +52,49 @@
                 </option>
                 </select> 
             <input type = "checkbox" id= "useBodyStyle">
-            <p>  Use make as a search parameter? (If yes, check the box) </p>
+            <p>  Use make as a search parameter? (If yes, check the box and enter your search term in the textbox) </p>
         </li>
 
         <li>
             <input type= "button" id="submitSearch" value="Run Search based on the above parameters">
         </li>
-
+        <br>
+        <li>
+            <input type="button" id="reset" value="Reset the table display">
+            <p>Press this button after every search, otherwise duplicate entries will appear.</p>
+        </li>
+        <br>
         <li>
             <label for="returnToHome"><a href="Index.html">Return to the Home Page</a></label>
 
               
         </li>
+
     </ul>
 
 
 </form>
 
-        <tbody>
-            <tr key= "lotID">
-              <th>lotID</th>
-              <th>Make</th>
-              <th>Model</th>
-              <th>Year</th>
-              <th>Package</th>
-              <th>Body Style</th>
+    <table>
+       
+            <tr>
+                <th>Make</th>
+                <th>Model</th>
+                <th>Year</th>
+                <th>Package</th>
+                <th>Body Style</th>
+                <th>Miles Per Gallon</th>
             </tr>
-            <!-- display database search results here -->
-          
-      </tbody>
+            <tbody id="rows">
+
+                <!-- display database query results here -->
+            </tbody>
+            
+            
+        
+    </table>
+
+            
         
     
     
@@ -87,18 +102,27 @@
     
     
     <style>
-        tr {
-            display: block;
-            float: center;
-            padding: 40px
+        table {
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
         }
-        th,
-        td {
-            display: block;
-            text-align: center;
-            padding: 20px;
-            border: 1px solid rgb(75, 66, 66);
-        
+
+        table td, table th {
+        border: 1px solid #ddd;
+        padding: 8px;
+        }
+
+        table tr:nth-child(even){background-color: #f2f2f2;}
+
+        table tr:hover {background-color: #ddd;}
+
+        table th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #04AA6D;
+        color: white;
         }
         p {
             display: inline;
@@ -107,7 +131,37 @@
     </style>
             <script src="reqs/pouchdb-7.2.1.min.js"></script>
             <script src="reqs/pouchdb.find.js"></script>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.8/react.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.8/react-dom.js"></script>
+
     <script>
+
+        document.getElementById("reset").addEventListener("click", function(){
+            location.reload();
+
+        })
+
+
+
+        var InventoryDB = PouchDB("http://localhost:5984/Inventory");
+        
+        InventoryDB.createIndex({      
+            ddoc : "idx-c0f7c4844e8caeb21acd4e52fe3e6852",      
+            index: {
+               //name: 'inventIndex',
+                fields: ['make', 'model', 'year', 'bodyStyle', 'package', 'mph' ],
+                sort: ['make', 'model', 'year', 'bodyStyle', 'package', 'mph']
+                }
+
+            }).then(function (result) {
+                    //console.log(result);
+            }).catch(function (err) {
+                    console.log(err);
+            });
+
+
+
         document.getElementById("submitSearch").addEventListener("click", function (){
             
             var boolMake = document.getElementById('useMake').checked;
@@ -115,41 +169,1073 @@
             var boolYear = document.getElementById('useYear').checked;
             var boolPack = document.getElementById('usePack').checked;
             var boolBodyStyle = document.getElementById('useBodyStyle').checked;
-            
+            var paramCount = 0;
+            var makeValue, modelValue, yearValue, bodyValue, packValue;
+            //these if statements determine which parameters are selected, and loads their values into memory for running the queries (As well as printing them in console for debug purposes).
             if(boolMake){
+                paramCount++;
                 var makeElement = document.getElementById('make');
-                var makeValue = makeElement.value;
+                 makeValue = makeElement.value;
                 console.log(makeValue);
-                //send data to PouchDB, first create index based on number of parameters specified(by checkboxes), then send the values of those parameters to perform the search
-                //todo create index based on number of checkboxes checked on search screen.
-            }
-
+                }
+            
             if(boolModel){
+                paramCount++;
                 var modelElement = document.getElementById('model');
-                var modelValue = modelElement.value;
+                 modelValue = modelElement.value;
                 console.log(modelValue);
                 
             }
 
             if(boolYear){
+                paramCount++;
                 var yearElement = document.getElementById('year');
-                var yearValue = yearElement.value;
+                yearValue = yearElement.value;
                 console.log(yearValue);
             }
 
             if(boolPack){
+                paramCount++;
                 var packElement = document.getElementById('pack');
-                var packValue = packElement.value;
+                packValue = packElement.value;
                 console.log(packValue);
             }
             if(boolBodyStyle){
+                paramCount++;
                 var bodyDropDown = document.getElementById('bodyStyle');
-                var bodyValue = bodyDropDown.options[bodyDropDown.selectedIndex].value;
+                bodyValue = bodyDropDown.options[bodyDropDown.selectedIndex].value;
                 console.log(bodyValue);
             }
 
+            //this switch statement determines which query to use, based on the parameters selected by the user via checkboxes
+            switch(paramCount){
+                // it should be noted that any record with a null-value attribute will not be displayed by any of these queries.
+            case 0:          
+                //query all docs, no parameters (manual browse)
+                InventoryDB.find({
+                    use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                    selector: {
+                        make: {
+                            "$gt": null
+                            },
+                        model: {
+                            "$gt": null
+                            },
+                        year: {
+                            "$gt": null
+                        },
+                        bodyStyle: {
+                            "$gt": null
+                        },
+                        package: {
+                            "$gt": null
+                        }
+                    }
+                }).then(function (result) {
+                    // display all db data via React : div="displayData" using the displayJSON function defined at the end of this <script> tag
+                    //consider pagination of results to save on memory(for all queries)
+                    displayJSON(JSON.stringify(result));
+                    console.log(result);
+                }).catch(function (err) {
+                    console.log(err);
+                });
+            break;
 
-        });
+            case 1:
+                if(boolMake){
+                    //query over Make
+                    InventoryDB.find({
+                    use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                    selector: {
+                        make: {
+                            "$eq": makeValue
+                            },
+                        model: {
+                            "$gt": null
+                            },
+                        year: {
+                            "$gt": null
+                        },
+                        bodyStyle: {
+                            "$gt": null
+                        },
+                        package: {
+                            "$gt": null
+                        }
+                    }
+                }).then(function (result) {
+                    // display all db data via React : div="displayData"
+                    console.log(result);
+                    displayJSON(JSON.stringify(result));
+                }).catch(function (err) {
+                    console.log(err);
+                });
+                }
+                else if(boolModel){
+                   //query over Model 
+                   InventoryDB.find({
+                    use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                    selector: {
+                        make: {
+                            "$gt": null
+                            },
+                        model: {
+                            "$eq": modelValue
+                            },
+                        year: {
+                            "$gt": null
+                        },
+                        bodyStyle: {
+                            "$gt": null
+                        },
+                        package: {
+                            "$gt": null
+                        }
+                    }
+                }).then(function (result) {
+                    // display all db data via React : div="displayData"
+                    displayJSON(JSON.stringify(result));
+                    console.log(result);
+                }).catch(function (err) {
+                    console.log(err);
+                });
+                }
+                else if(boolYear){
+                    //query over year
+                    InventoryDB.find({
+                    use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                    selector: {
+                        make: {
+                            "$gt": null
+                            },
+                        model: {
+                            "$gt": null
+                            },
+                        year: {
+                            "$eq": yearValue
+                        },
+                        bodyStyle: {
+                            "$gt": null
+                        },
+                        package: {
+                            "$gt": null
+                        }
+                    }
+                }).then(function (result) {
+                    // display all db data via React : div="displayData"
+                    displayJSON(JSON.stringify(result));
+                    console.log(result);
+                }).catch(function (err) {
+                    console.log(err);
+                });
+                }
+                else if(boolPack){
+                    //query over Package
+                    InventoryDB.find({
+                    use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                    selector: {
+                        make: {
+                            "$gt": null
+                            },
+                        model: {
+                            "$gt": null
+                            },
+                        year: {
+                            "$gt": null
+                        },
+                        bodyStyle: {
+                            "$gt": null
+                        },
+                        package: {
+                            "$eq": packValue
+                        }
+                    }
+                }).then(function (result) {
+                    // display all db data via React : div="displayData"
+                    displayJSON(JSON.stringify(result));
+                    console.log(result);
+                }).catch(function (err) {
+                    console.log(err);
+                });
+                }
+                else if(boolBodyStyle){
+                    //query over BodyStyle
+                    InventoryDB.find({
+                    use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                    selector: {
+                        make: {
+                            "$gt": null
+                            },
+                        model: {
+                            "$gt": null
+                            },
+                        year: {
+                            "$gt": null
+                        },
+                        bodyStyle: {
+                            "$eq": bodyValue
+                        },
+                        package: {
+                            "$gt": null
+                        }
+                    }
+                }).then(function (result) {
+                    // display all db data via React : div="displayData"
+                    displayJSON(JSON.stringify(result));
+                    console.log(result);
+                }).catch(function (err) {
+                    console.log(err);
+                });
+                }
+            break;
+
+            case 5:
+                //query over all
+                InventoryDB.find({
+                    use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                    selector: {
+                        make: {
+                            "$eq": makeValue
+                            },
+                        model: {
+                            "$eq": modelValue
+                            },
+                        year: {
+                            "$eq": yearValue
+                        },
+                        bodyStyle: {
+                            "$eq": bodyValue
+                        },
+                        package: {
+                            "$eq": packValue
+                        }
+                    }
+                }).then(function (result) {
+                    // display all db data via React : div="displayData"
+                    displayJSON(JSON.stringify(result));
+                    console.log(result);
+                }).catch(function (err) {
+                    console.log(err);
+                });
+
+            break;
+
+            case 4:
+                if(!boolMake){
+                        //query over all but make
+                    InventoryDB.find({
+                        use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                        selector: {
+                            make: {
+                                "$gt": null
+                                },
+                            model: {
+                                "$eq": modelValue
+                                },
+                            year: {
+                                "$eq": yearValue
+                            },
+                            bodyStyle: {
+                                "$eq": bodyValue
+                            },
+                            package: {
+                                "$eq": packValue
+                            }
+                        }
+                    }).then(function (result) {
+                        // display all db data via React : div="displayData"
+                        displayJSON(JSON.stringify(result));
+                        console.log(result);
+                    }).catch(function (err) {
+                        console.log(err);
+                    });
+                    }
+                else if(!boolModel){
+                    //query over all but model
+                    InventoryDB.find({
+                        use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                        selector: {
+                            make: {
+                                "$eq": makeValue
+                                },
+                            model: {
+                                "$gt": null
+                                },
+                            year: {
+                                "$eq": yearValue
+                            },
+                            bodyStyle: {
+                                "$eq": bodyValue
+                            },
+                            package: {
+                                "$eq": packValue
+                            }
+                        }
+                    }).then(function (result) {
+                        // display all db data via React : div="displayData"
+                        displayJSON(JSON.stringify(result));
+                        console.log(result);
+                    }).catch(function (err) {
+                        console.log(err);
+                    });
+                }
+                else if(!boolYear){
+                    //query over all but year
+                    InventoryDB.find({
+                        use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                        selector: {
+                            make: {
+                                "$eq": makeValue
+                                },
+                            model: {
+                                "$eq": modelValue
+                                },
+                            year: {
+                                "$gt": null
+                            },
+                            bodyStyle: {
+                                "$eq": bodyValue
+                            },
+                            package: {
+                                "$eq": packValue
+                            }
+                        }
+                    }).then(function (result) {
+                        // display all db data via React : div="displayData"
+                        displayJSON(JSON.stringify(result));
+                        console.log(result);
+                    }).catch(function (err) {
+                        console.log(err);
+                    });
+                }
+                else if(!boolPack){
+                    //query over all but package
+                    InventoryDB.find({
+                        use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                        selector: {
+                            make: {
+                                "$eq": makeValue
+                                },
+                            model: {
+                                "$eq": modelValue
+                                },
+                            year: {
+                                "$eq": yearValue
+                            },
+                            bodyStyle: {
+                                "$eq": bodyValue
+                            },
+                            package: {
+                                "$gt": null
+                            }
+                        }
+                    }).then(function (result) {
+                        // display all db data via React : div="displayData"
+                        displayJSON(JSON.stringify(result));
+                        console.log(result);
+                    }).catch(function (err) {
+                        console.log(err);
+                    });
+                }
+                else if(!boolBodyStyle){
+                    //query over all but BodyStyle
+                    InventoryDB.find({
+                        use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                        selector: {
+                            make: {
+                                "$eq": makeValue
+                                },
+                            model: {
+                                "$eq": modelValue
+                                },
+                            year: {
+                                "$eq": yearValue
+                            },
+                            bodyStyle: {
+                                "$gt": null
+                            },
+                            package: {
+                                "$eq": packValue
+                            }
+                        }
+                    }).then(function (result) {
+                        // display all db data via React : div="displayData"
+                        displayJSON(JSON.stringify(result));
+                        console.log(result);
+                    }).catch(function (err) {
+                        console.log(err);
+                    });
+                }
+            break;
+
+            case 2:
+                if(boolMake){
+                        
+                        if(boolModel){
+                        //query over Model & make
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$eq": makeValue
+                                    },
+                                model: {
+                                    "$eq": modelValue
+                                    },
+                                year: {
+                                    "$gt": null
+                                },
+                                bodyStyle: {
+                                    "$gt": null
+                                },
+                                package: {
+                                    "$gt": null
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                        else if(boolYear){
+                            //query over year & make
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$eq": makeValue
+                                    },
+                                model: {
+                                    "$gt": null
+                                    },
+                                year: {
+                                    "$eq": yearValue
+                                },
+                                bodyStyle: {
+                                    "$gt": null
+                                },
+                                package: {
+                                    "$gt": null
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                        else if(boolPack){
+                            //query over Package & Make
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$eq": makeValue
+                                    },
+                                model: {
+                                    "$gt": null
+                                    },
+                                year: {
+                                    "$gt": null
+                                },
+                                bodyStyle: {
+                                    "$gt": null
+                                },
+                                package: {
+                                    "$eq": packValue
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                        else if(boolBodyStyle){
+                            //query over BodyStyle & Make
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$eq": makeValue
+                                    },
+                                model: {
+                                    "$gt": null
+                                    },
+                                year: {
+                                    "$gt": null
+                                },
+                                bodyStyle: {
+                                    "$eq": bodyValue
+                                },
+                                package: {
+                                    "$gt": null
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                }
+                else if(boolModel){
+
+
+                         if(boolYear){
+                            //query over year & Model
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$gt": null
+                                    },
+                                model: {
+                                    "$eq": modelValue
+                                    },
+                                year: {
+                                    "$eq": yearValue
+                                },
+                                bodyStyle: {
+                                    "$gt": null
+                                },
+                                package: {
+                                    "$gt": null
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                        else if(boolPack){
+                            //query over Package & Model
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$gt": null
+                                    },
+                                model: {
+                                    "$eq": modelValue
+                                    },
+                                year: {
+                                    "$gt": null
+                                },
+                                bodyStyle: {
+                                    "$gt": null
+                                },
+                                package: {
+                                    "$eq": packValue
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                        else if(boolBodyStyle){
+                            //query over BodyStyle & Model
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$gt": null
+                                    },
+                                model: {
+                                    "$eq": modelValue
+                                    },
+                                year: {
+                                    "$gt": null
+                                },
+                                bodyStyle: {
+                                    "$eq": bodyValue
+                                },
+                                package: {
+                                    "$gt": null
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                }
+                else if(boolYear){
+
+                         if(boolPack){
+                            //query over Package & Year
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$gt": null
+                                    },
+                                model: {
+                                    "$gt": null
+                                    },
+                                year: {
+                                    "$eq": yearValue
+                                },
+                                bodyStyle: {
+                                    "$gt": null
+                                },
+                                package: {
+                                    "$eq": packValue
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                        else if(boolBodyStyle){
+                            //query over BodyStyle & year
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$gt": null
+                                    },
+                                model: {
+                                    "$gt": null
+                                    },
+                                year: {
+                                    "$eq": yearValue
+                                },
+                                bodyStyle: {
+                                    "$eq": bodyValue
+                                },
+                                package: {
+                                    "$gt": null
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                }
+                else if(boolPack){
+
+                        if(boolBodyStyle){
+                            //query over pack & body
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$gt": null
+                                    },
+                                model: {
+                                    "$gt": null
+                                    },
+                                year: {
+                                    "$gt": null
+                                },
+                                bodyStyle: {
+                                    "$gt": null
+                                },
+                                package: {
+                                    "$gt": null
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                }
+                break;
+
+            //this case(paramcount = 3) is the inverse of (paramcount = 2), where we find the two parameters not used, and query over all the others. requires less if statements this way. 
+            case 3: 
+            if(!boolMake){
+                        
+                        if(!boolModel){
+                        //query over Year, Pack, body
+                        InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$gt": null
+                                    },
+                                model: {
+                                    "$gt": null
+                                    },
+                                year: {
+                                    "$eq": yearValue
+                                },
+                                bodyStyle: {
+                                    "$eq": bodyValue
+                                },
+                                package: {
+                                    "$eq": packValue 
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                        else if(!boolYear){
+                            //query over Model, Pack, Body
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$gt": null
+                                    },
+                                model: {
+                                    "$eq": modelValue
+                                    },
+                                year: {
+                                    "$gt": null
+                                },
+                                bodyStyle: {
+                                    "$eq": bodyValue
+                                },
+                                package: {
+                                    "$eq": packValue
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            console.log(result);
+                            displayJSON(JSON.stringify(result));
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                        else if(!boolPack){
+                            //query over Model, Year, body
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$gt": null
+                                    },
+                                model: {
+                                    "$eq": modelValue
+                                    },
+                                year: {
+                                    "$eq": yearValue
+                                },
+                                bodyStyle: {
+                                    "$eq": bodyValue
+                                },
+                                package: {
+                                    "$gt": null
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                        else if(!boolBodyStyle){
+                            //query over model, pack, year
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$gt": null
+                                    },
+                                model: {
+                                    "$eq": modelValue
+                                    },
+                                year: {
+                                    "$eq": yearValue
+                                },
+                                bodyStyle: {
+                                    "$gt": null
+                                },
+                                package: {
+                                    "$eq": packValue
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                }
+                else if(!boolModel){
+
+
+                         if(!boolYear){
+                            //query over make, pack, body
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$eq": makeValue
+                                    },
+                                model: {
+                                    "$gt": null
+                                    },
+                                year: {
+                                    "$gt": null
+                                },
+                                bodyStyle: {
+                                    "$eq": bodyValue
+                                },
+                                package: {
+                                    "$eq": packValue
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                        else if(!boolPack){
+                            //query over make, body, year
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$eq": makeValue
+                                    },
+                                model: {
+                                    "$gt": null
+                                    },
+                                year: {
+                                    "$eq": yearValue
+                                },
+                                bodyStyle: {
+                                    "$eq": bodyValue
+                                },
+                                package: {
+                                    "$gt": null
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                        else if(!boolBodyStyle){
+                            //query over make,  year, pack
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$eq": makeValue
+                                    },
+                                model: {
+                                    "$gt": null
+                                    },
+                                year: {
+                                    "$eq": yearValue
+                                },
+                                bodyStyle: {
+                                    "$gt": null
+                                },
+                                package: {
+                                    "$eq": packValue
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                }
+                else if(!boolYear){
+
+
+                         if(!boolPack){
+                            //query over Make, Model, Body 
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$eq": makeValue
+                                    },
+                                model: {
+                                    "$eq": modelValue
+                                    },
+                                year: {
+                                    "$gt": null
+                                },
+                                bodyStyle: {
+                                    "$eq": bodyValue
+                                },
+                                package: {
+                                    "$gt": null
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                        else if(!boolBodyStyle){
+                            //query over Make, Model, Pack
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$eq": makeValue
+                                    },
+                                model: {
+                                    "$eq": modelValue
+                                    },
+                                year: {
+                                    "$gt": null
+                                },
+                                bodyStyle: {
+                                    "$gt": null
+                                },
+                                package: {
+                                    "$eq": packValue
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                }
+                else if(! boolPack){
+
+                        if(!boolBodyStyle){
+                            //query make, model, year
+                            InventoryDB.find({
+                            use_index: "_design/idx-c0f7c4844e8caeb21acd4e52fe3e6852",
+                            selector: {
+                                make: {
+                                    "$eq": makeValue
+                                    },
+                                model: {
+                                    "$eq": modelValue
+                                    },
+                                year: {
+                                    "$eq": yearValue
+                                },
+                                bodyStyle: {
+                                    "$gt": null
+                                },
+                                package: {
+                                    "$gt": null
+                                }
+                            }
+                        }).then(function (result) {
+                            // display all db data via React : div="displayData"
+                            displayJSON(JSON.stringify(result));
+                            console.log(result);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                        }
+                }
+                break;    
+
+            }
+
+        });//event listener end
+        
+        
+        
+
+        
+        //this function will take the result of our queries and display them in a table on the webpage
+        function displayJSON(j){
+            var pj = JSON.parse(j);
+
+            var docCount = pj.docs.length;
+            /*
+            const cols = [
+                { accessor: 'make', Header: 'Make' },
+                { accessor: 'model', Header: 'Model' },    
+                { accessor: 'year', Header: 'Year' },
+                { accessor: 'package', Header: 'Package'},
+                { accessor: 'bodyStyle', Header: 'Body Style'},
+                { accessor: 'mpg', Header: 'MPG'}
+            ];
+            */
+                for(var step= 0; step < pj.docs.length; step++){
+                    //console.log(pj.docs[step].make);
+
+                    var newMake = document.createElement("td");
+                    var newModel = document.createElement("td");
+                    var newYear = document.createElement("td");
+                    var newPackage = document.createElement("td");
+                    var newBodyStyle = document.createElement("td");
+                    var newMPG = document.createElement("td");
+
+                    var newRow = document.createElement("tr");
+
+                    newMake.innerHTML = pj.docs[step].make;
+                    newModel.innerHTML = pj.docs[step].model;
+                    newYear.innerHTML = pj.docs[step].year;
+                    newPackage.innerHTML = pj.docs[step].package;
+                    newBodyStyle.innerHTML = pj.docs[step].bodyStyle;
+                    newMPG.innerHTML = pj.docs[step].mpg;
+
+                    newRow.appendChild(newMake);
+                    newRow.appendChild(newModel);
+                    newRow.appendChild(newYear);
+                    newRow.appendChild(newPackage);
+                    newRow.appendChild(newBodyStyle);
+                    newRow.appendChild(newMPG);
+
+                    document.getElementById("rows").appendChild(newRow);
+
+                }
+
+        }
 
     
 
