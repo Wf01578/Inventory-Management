@@ -10,13 +10,13 @@ In order to make this Program functional there are a few libraries that must be 
 1. Install NODE.JS (mostly just for use of npm)
 2. open a command prompt and type the following commands to install necessary requirements:
 
-$npm PouchDB
+  $npm isntall pouchdb
 
-$npm PouchDB-find
+  $npm install pouchdb-find
 
-$ npm install -g pouchdb-server
+  $npm install -g pouchdb-server
 
-$ pouchdb-server --port 5984
+  $pouchdb-server --port 5984
 
 
 3. Now all of the necessary library requirements should be installed, and the final command in the list creates a local PouchDB database hosted on Port 5984. The GUI for this database can be accessed via: http://localhost:5984 (in case things aren't working properly check the GUI and verify installation requirements)
