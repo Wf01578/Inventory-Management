@@ -8,16 +8,63 @@
     
     <Body>
         <form>
+            <li>
+                <input type="file" id="selectFiles" value="Import" /><br />
+            </li>
+            <li>
             <input type="button" id="submitData" value="Submit Your Data">
-
-        </form>
+            </li>
+            <li>
+                <label for="returnToHome"><a href="Index.html">Return to the Home Page</a></label>
+                
+                  
+            </li>
+            <li>
+                <Label for="Status" id="uploadStatus" value=""></Label>
+            </li>
         
     
     
     
-    </form>
-    
-    
+        </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.21.1/babel.min.js"></script>
+    <script src="reqs/pouchdb-7.2.1.min.js"></script>
+    <script src="reqs/pouchdb.find.js"></script>
+
+    <script>
+        var LoginsDB = new PouchDB("http://localhost:5984/Logins");
+        var InventoryDB = new PouchDB("http://localhost:5984/Inventory");
+
+        document.getElementById("submitData").addEventListener("click", function(){
+            var files = document.getElementById('selectFiles').files;
+            //console.log(files);
+            if (files.length <= 0) {
+                return false;
+            }
+
+            var fr = new FileReader();
+
+            fr.onload = function(e) { 
+                console.log(e);
+                var result = JSON.parse(e.target.result);
+                InventoryDB.bulkDocs(result).then(function (result) {
+                    document.getElementById("uploadStatus").innerHTML = ("Data upload successful");
+
+                    console.log(result);
+                }).catch(function (err) {
+                    console.log(err);
+                });
+                    console.log(result);
+                   
+            }
+
+            fr.readAsText(files.item(0));
+        })
+
+    </script>
     </Body>
     
     </HTML>
