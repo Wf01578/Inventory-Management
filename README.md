@@ -11,6 +11,8 @@ In order to make this Program functional there are a few libraries that must be 
 2. open a command prompt and type the following commands to install necessary requirements:
 
   $npm isntall pouchdb
+  
+  $npm install react
 
   $npm install pouchdb-find
 
