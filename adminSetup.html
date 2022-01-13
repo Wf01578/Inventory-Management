@@ -34,12 +34,41 @@
             </ul>
 
         </form>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-dom.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.21.1/babel.min.js"></script>
+        <script src="reqs/pouchdb-7.2.1.min.js"></script>
+        <script src="reqs/pouchdb.find.js"></script>
         <script>
+            var LoginsDB = new PouchDB('http://localhost:5984/Logins')
+
+
             document.getElementById("submitSetup").addEventListener("click", function() {
                 if ( document.getElementById("password").value == document.getElementById("confirmPassword").value ){
                     //send username/password combo to pouchDB
-                    console.log(document.getElementById("username").value);
-                    console.log(document.getElementById("password").value);
+                    var uName= document.getElementById("username").value
+                    var pWord = document.getElementById("password").value;
+                    console.log(uName);
+                    console.log(pWord);
+
+                                        
+
+                    LoginsDB.put({
+                        _id: uName,
+                        name: uName,
+                        password: pWord
+                    }).then(function (response) {
+                        console.log(response);
+                    }).catch(function (err) {
+                        console.log(err);
+                    });
+                    
+
+
+                }
+                else{
+                    console.log("Passords don't match");
                 }
                     
             });
