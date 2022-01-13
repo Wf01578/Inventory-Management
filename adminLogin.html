@@ -48,7 +48,7 @@
 
 
             
-            var loginsDB = new PouchDB("Logins");
+            var LoginsDB = new PouchDB("http://localhost:5984/Logins");
 
             document.getElementById("submitSetup").addEventListener("click", function() {
                 var uName = document.getElementById("username").value;
@@ -57,32 +57,43 @@
 
                 
                     //the following 2 lines were used for debug, todo: disable upon completion
-                    console.log(uName);
-                    console.log(pWord);
+                console.log(uName);
+                console.log(pWord);
                 var tempJSON = "";
 
-
-                loginsDB.createIndex({
-                index: {
-                    fields: ['username', 'password'],
-                    sort: ['username']
-                }
-                }).then(function () {
-                tempJSON += (loginsDB.find({
-                    selector: {
-                    name: uName,
-                    password: pWord
+                LoginsDB.createIndex({
+                    ddoc: "idx-537dc89e0afd84f35f4a5cb309ead823",
+                    index: {
+                    fields: ['name', 'password'],
+                    sort: ['name']
                     }
-                }));
+
+                }).then(function (result) {
+                    //console.log(result);
+                }).catch(function (err) {
+                    console.log(err);
                 });
-                //var parsedJSON = JSON.parse(tempJSON);
-                var storedPWord = tempJSON.password;
-                if(pWord == storedPWord){
-                    console.log("Password authentication successful")
 
-                }
+                var storedPword = "";             
 
+                LoginsDB.find({
+                    use_index: '_design/idx-537dc89e0afd84f35f4a5cb309ead823',
+                    selector: {name: uName, 
+                            password: pWord},
+                    fields: [ 'name', 'password'],
+                    sort: ['name']
+                }).then(function (result) {
+                    console.log(result.docs[0].password);
                     
+                    if(result.docs[0].password == pWord){
+
+                        console.log("Admin Login Successful")
+                        //redirect to admin home page, enable authentication token? 
+                    }
+                    //console.log(result);
+                }).catch(function (err) {
+                    console.log(err);
+                });                    
             });
         </script>
     </body>
