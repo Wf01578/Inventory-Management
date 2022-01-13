@@ -1,0 +1,183 @@
+[
+    {
+        "_id": "0000",
+        "make": "Toyota",
+        "model": "Prius",
+        "bodyStyle": "Sedan",
+        "package": "LX",
+        "year": "2009",
+        "mpg": "60"
+    },
+    {
+        "_id": "0001",
+        "make": "Ford",
+        "model": "F 150",
+        "bodyStyle": "Truck",
+        "package": "LS",
+        "year": "2017",
+        "mpg": "20"
+    },
+    {
+        "_id": "0002",
+        "make": "Nissan",
+        "model": "Tundra",
+        "bodyStyle": "Truck",
+        "package": "LS",
+        "year": "2018",
+        "mpg": "18"
+    },
+    {
+        "_id": "0003",
+        "make": "Audi",
+        "model": "R8",
+        "bodyStyle": "Coupe",
+        "package": "ZX",
+        "year": "2019",
+        "mpg": "30"
+    },
+    {
+        "_id": "0004",
+        "make": "Toyota",
+        "model": "Camry",
+        "bodyStyle": "Sedan",
+        "package": "LS",
+        "year": "2017",
+        "mpg": "20"
+    },
+    {
+        "_id": "0005",
+        "make": "Lexus",
+        "model": "GX 460",
+        "bodyStyle": "CrossOver",
+        "package": "LX",
+        "year": "2019",
+        "mpg": "39"
+
+    },
+    {
+        "_id": "0006",
+        "make": "GMC",
+        "model": "Sierra",
+        "bodyStyle": "Truck",
+        "package": "TR",
+        "year": "1967",
+        "mpg": "20"
+    },
+    {
+        "_id": "0007",
+        "make": "Ferrari",
+        "model": "F12",
+        "bodyStyle": "Coupe",
+        "package": "LX",
+        "year": "1998",
+        "mpg": "40"
+    },
+    {
+        "_id": "0008",
+        "make": "Chevrolet",
+        "model": "Impala",
+        "bodyStyle": "Coupe",
+        "package": "TR",
+        "year": "1967",
+        "mpg": "20"
+    },
+    {
+        "_id": "0009",
+        "make": "Hyundai",
+        "model": "Sonata",
+        "bodyStyle": "Sedan",
+        "package": "LX",
+        "year": "2012",
+        "mpg": "30"
+    },
+    {
+        "_id": "0010",
+        "make": "Porsche",
+        "model": "Cayenne",
+        "bodyStyle": "CrossOver",
+        "package": "TX",
+        "year": "2010",
+        "mpg": "30"
+    },
+    {
+        "_id": "0011",
+        "make": "Chevrolet",
+        "model": "Corvette",
+        "bodyStyle": "Coupe",
+        "package": "LX",
+        "year": "1998",
+        "mpg": "37"
+    },
+    {
+        "_id": "0012",
+        "make": "Tesla",
+        "model": "Model X",
+        "bodyStyle": "Sedan",
+        "package": "ZX",
+        "year": "2017",
+        "mpg": "90"
+    },
+    {
+        "_id": "0013",
+        "make": "Kia",
+        "model": "Soul",
+        "bodyStyle": "Sedan",
+        "package": "LS",
+        "year": "2012",
+        "mpg": "43"
+    },
+    {
+        "_id": "0014",
+        "make": "Mazda",
+        "model": "MX3",
+        "bodyStyle": "Sedan",
+        "package": "LS",
+        "year": "2013",
+        "mpg": "48"
+    },
+    {
+        "_id": "0015",
+        "make": "Volvo",
+        "model": "S60",
+        "bodyStyle": "Sedan",
+        "package": "LX",
+        "year": "2021",
+        "mpg": "60"
+    },
+    {
+        "_id": "0016",
+        "make": "Volvo",
+        "model": "XC60",
+        "bodyStyle": "CrossOver",
+        "package": "TR",
+        "year": "1967",
+        "mpg": "20"
+    },
+    {
+        "_id": "0017",
+        "make": "Mitsubishi",
+        "model": "Lancer Evo",
+        "bodyStyle": "Coupe",
+        "package": "LZ",
+        "year": "1997",
+        "mpg": "30"
+    },
+    {
+        "_id": "0018",
+        "make": "Mazda",
+        "model": "Mazda3",
+        "bodyStyle": "HatchBack",
+        "package": "TR",
+        "year": "2005",
+        "mpg": "30"
+    },
+    {
+        "_id": "0019",
+        "make": "BMW",
+        "model": "Z4 Roadster",
+        "bodyStyle": "Sedan",
+        "package": "LS",
+        "year": "2020",
+        "mpg": "30"
+    }
+]
